@@ -1,53 +1,60 @@
-# PHP
-# Test and package your PHP project.
-# Add steps that run tests, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/php
-
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
-
-variables:
-  phpVersion: '8.1'  # Ensure compatibility with Drupal 10
-  appServiceName: 'as1-phpwp1'  # Replace with your App Service name
-  resourceGroup: 'cloud-training-as1'  # Replace with your Azure Resource Group
-  publishFolder: 'publish'
-
-
-steps:
-# 1. Checkout code
-- task: Checkout@1
-
-# 2. Setup PHP environment
-- task: UsePhpVersion@1
-  inputs:
-    version: $(phpVersion)
-    addToPath: true
-
-# 3. Install dependencies
-- script: |
-    composer install --no-dev --optimize-autoloader
-  displayName: 'Install Composer dependencies'
-
-# 4. Package application
-- script: |
-    mkdir $(publishFolder)
-    cp -R . $(publishFolder)
-    # Add any specific packaging or preparation steps
-  displayName: 'Prepare application for deployment'
-
-# 5. Deploy to Azure App Service
-- task: AzureWebApp@1
-  inputs:
-    azureSubscription: '<Your-Service-Connection>'  # Replace with your Azure service connection
-    appType: 'webAppLinux'  # Assuming Linux App Service
-    appName: $(appServiceName)
-    package: '$(System.DefaultWorkingDirectory)/$(publishFolder)'
-    runtimeStack: 'PHP|8.1'
-
-# 6. Run Drupal database updates (optional)
-- script: |
-    az webapp ssh --name $(appServiceName) --resource-group $(resourceGroup) --command "php /home/site/wwwroot/vendor/drush/drush/drush updb -y"
-  displayName: 'Run Drupal database updates'
+name: deploy-$(Build.SourceBranchName)-$(Date:dd-MMM-yyyy)
+trigger: none
+stages:
+  - stage: Drupal_Dockerization
+    displayName: Dockerization of Drupal and Push to Container Registry
+    jobs:
+      - job: Dockerization
+        steps:
+          - task: DownloadSecureFile@1
+            displayName: Terraform init
+            name: CertificateSSL
+            inputs:
+              secureFile: 'DigiCertGlobalRootCA.crt.pem'
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(Agent.TempDirectory)'
+              Contents: '*.pem'
+              TargetFolder: '$(Build.Repository.LocalPath)'
+          - task: Bash@3
+            inputs:
+              targetType: 'inline'
+              script: |
+                find sites/default/settings.php -exec sed -i -- "s/{user}/$(dbuser)/g" {} \;
+                find sites/default/settings.php -exec sed -i -- "s/{pass}/$(dbpass)/g" {} \;
+#                find settings.php -exec sed -i -- "s/{user}/$(dbuser)/g" {} \;
+#                find settings.php -exec sed -i -- "s/{pass}/$(dbpass)/g" {} \;
+          - task: Docker@2
+            displayName: Dockerizing Drupal
+            inputs:
+              containerRegistry: 'Docker-SP'
+              repository: 'acrdrupalsite'
+              command: 'buildAndPush'
+              Dockerfile: 'dockerfile'  
+  - stage: Drupal_Deployment_K8s
+    displayName: Drupal Deployment on K8s
+    jobs:
+      - deployment: Drupal_Deployment_K8s
+        environment: Drupal-Deployment
+        displayName: Drupal Deployment on K8s
+        strategy:
+          runOnce:
+            deploy:  
+               steps:
+                 - checkout: self
+                 - task: AzureCLI@2
+                   displayName: 'Login to Accelerator cluster and deploy'
+                   inputs:
+                     azureSubscription: 'AzK8sConnect'
+                     scriptType: bash
+                     scriptLocation: inlineScript
+                     inlineScript: |
+                       ls -l
+                       pwd
+                       az aks install-cli
+                       az aks get-credentials --resource-group Accelerator-RG --name  Accelerator-AKS --overwrite-existing
+                       kubelogin convert-kubeconfig -l spn --client-id $servicePrincipalId --client-secret $servicePrincipalKey
+                       find K8/k8deploy.yml -exec sed -i -- "s/{rev}/$(Build.BuildId)/g" {} \;
+                       kubectl apply -f K8/k8deploy.yml
+                     addSpnToEnvironment: true
+                        

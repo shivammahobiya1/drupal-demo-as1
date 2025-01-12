@@ -20,7 +20,7 @@ RUN composer install
 
 
 
-COPY settings.php /var/www/html/drupal-site/web/sites/default/
+COPY sites/default/settings.php /var/www/html/drupal-site/web/sites/default/
 
 RUN cd /etc/apache2/sites-available
 RUN rm -Rf 000-default.conf
