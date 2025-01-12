@@ -28,33 +28,26 @@ stages:
             displayName: Dockerizing Drupal
             inputs:
               containerRegistry: 'druaprg'
-              repository: 'acrdrupalsite'
+              repository: 'hello-world'
               command: 'buildAndPush'
               Dockerfile: 'dockerfile'  
-  - stage: Drupal_Deployment_K8s
-    displayName: Drupal Deployment on K8s
+  - stage: Drupal_Deployment_az_appserv
+    displayName: Drupal Deployment on az app service
     jobs:
-      - deployment: Drupal_Deployment_K8s
+      - deployment: Drupal_Deployment_az_appserv
         environment: Drupal-Deployment
-        displayName: Drupal Deployment on K8s
+        displayName: Drupal Deployment on az app service
         strategy:
           runOnce:
             deploy:  
                steps:
                  - checkout: self
-                 - task: AzureCLI@2
-                   displayName: 'Login to Accelerator cluster and deploy'
-                   inputs:
-                     azureSubscription: 'AzK8sConnect'
-                     scriptType: bash
-                     scriptLocation: inlineScript
-                     inlineScript: |
-                       ls -l
-                       pwd
-                       az aks install-cli
-                       az aks get-credentials --resource-group Accelerator-RG --name  Accelerator-AKS --overwrite-existing
-                       kubelogin convert-kubeconfig -l spn --client-id $servicePrincipalId --client-secret $servicePrincipalKey
-                       find K8/k8deploy.yml -exec sed -i -- "s/{rev}/$(Build.BuildId)/g" {} \;
-                       kubectl apply -f K8/k8deploy.yml
-                     addSpnToEnvironment: true
-                        
+                - task: AzureRmWebAppDeployment@4
+                  inputs:
+                    ConnectionType: 'AzureRM'
+                    azureSubscription: 'Free Trial'
+                    appType: 'webAppHyperVContainer'
+                    WebAppName: 'phpdemoapp1'
+                    DockerNamespace: 'druaprg.azurecr.io'
+                    DockerRepository: 'hello-world'
+                                    
