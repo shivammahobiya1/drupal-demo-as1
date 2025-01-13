@@ -38,9 +38,9 @@ RUN cd /var/www/html/drupal-site && vendor/bin/drush --version
 RUN cd /var/www/html/drupal-site && vendor/bin/drush cr -vvv
 RUN cd /var/www/html/drupal-site && vendor/bin/drush updb --yes -vvv
 RUN cd /var/www/html/drupal-site && vendor/bin/drush cim --yes -vvv
-RUN cd /var/www/html/drupal-site && vendor/bin/drush cr --uri=http://phpdemoapp1-bfdbf2abe9bud3h7.eastasia-01.azurewebsites.net -vvv
-RUN cd /var/www/html/drupal-site && vendor/bin/drush updb --uri=http://phpdemoapp1-bfdbf2abe9bud3h7.eastasia-01.azurewebsites.net -vvv
-RUN cd /var/www/html/drupal-site && vendor/bin/drush cim --uri=http://phpdemoapp1-bfdbf2abe9bud3h7.eastasia-01.azurewebsites.net -vvv
+#RUN cd /var/www/html/drupal-site && vendor/bin/drush cr --uri=http://phpdemoapp1-bfdbf2abe9bud3h7.eastasia-01.azurewebsites.net -vvv
+#RUN cd /var/www/html/drupal-site && vendor/bin/drush updb --uri=http://phpdemoapp1-bfdbf2abe9bud3h7.eastasia-01.azurewebsites.net -vvv
+#RUN cd /var/www/html/drupal-site && vendor/bin/drush cim --uri=http://phpdemoapp1-bfdbf2abe9bud3h7.eastasia-01.azurewebsites.net -vvv
 
 RUN ls -la
 
