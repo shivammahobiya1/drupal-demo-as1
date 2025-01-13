@@ -25,12 +25,11 @@ stages:
 #                find settings.php -exec sed -i -- "s/{user}/$(dbuser)/g" {} \;
 #                find settings.php -exec sed -i -- "s/{pass}/$(dbpass)/g" {} \;
           - task: Docker@2
-            displayName: Dockerizing Drupal
             inputs:
-              containerRegistry: 'druaprg'
-              repository: 'hello-world'
+              containerRegistry: 'dockeracr'
+              repository: 'druaprg'
               command: 'buildAndPush'
-              Dockerfile: 'dockerfile'
+              Dockerfile: '**/Dockerfile'
   - stage: Drupal_Deployment_az_appserv
     displayName: Drupal Deployment on az app service
     jobs:
