@@ -27,10 +27,10 @@ stages:
           - task: Docker@2
             displayName: Dockerizing Drupal
             inputs:
-              containerRegistry: 'druaprg'
+              containerRegistry: 'dockeracr'
               repository: 'hello-world'
               command: 'buildAndPush'
-              Dockerfile: 'dockerfile'  
+              Dockerfile: 'dockerfile'
   - stage: Drupal_Deployment_az_appserv
     displayName: Drupal Deployment on az app service
     jobs:
@@ -42,12 +42,11 @@ stages:
             deploy:  
                steps:
                  - checkout: self
-                - task: AzureRmWebAppDeployment@4
-                  inputs:
-                    ConnectionType: 'AzureRM'
-                    azureSubscription: 'Free Trial'
-                    appType: 'webAppHyperVContainer'
-                    WebAppName: 'phpdemoapp1'
-                    DockerNamespace: 'druaprg.azurecr.io'
-                    DockerRepository: 'hello-world'
-                                    
+                 - task: AzureRmWebAppDeployment@4
+                   inputs:
+                     ConnectionType: 'AzureRM'
+                     azureSubscription: 'Azurescdevops'
+                     appType: 'webAppContainer'
+                     WebAppName: 'phpdemoapp1'
+                     DockerNamespace: 'druaprg.azure.io'
+                     DockerRepository: 'hello-world:{rev}'
