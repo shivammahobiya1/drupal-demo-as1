@@ -31,9 +31,11 @@ RUN cd /etc/apache2/sites-enabled
 RUN rm -Rf 000-default.conf
 COPY 000-default.conf /etc/apache2/sites-enabled/ 
 RUN mkdir -p /var/www/html/sites/default/files
-RUN chown www-data:www-data /var/www/html/sites/default/files
-RUN chmod -Rf 777 /var/www/html/sites
-RUN chmod -Rf 777 /var/www/html/drupal-site
+RUN chown www-data:www-data /var/www/html
+#RUN chown www-data:www-data /var/www/html/sites/default/files
+RUN chmod -Rf 777 /var/www/html
+#RUN chmod -Rf 777 /var/www/html/sites
+#RUN chmod -Rf 777 /var/www/html/drupal-site
 RUN cd /var/www/html/drupal-site && vendor/bin/drush --version
 RUN cd /var/www/html/drupal-site && vendor/bin/drush cr -vvv
 RUN cd /var/www/html/drupal-site && vendor/bin/drush updb --yes -vvv
