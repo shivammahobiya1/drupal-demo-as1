@@ -827,3 +827,4 @@ $databases['default']['default'] = array (
     PDO::MYSQL_ATTR_SSL_CA => 'DigiCertGlobalRootCA.crt.pem',
   ],
 );
+$settings['config_sync_directory'] = $app_root . '/../config/default';
