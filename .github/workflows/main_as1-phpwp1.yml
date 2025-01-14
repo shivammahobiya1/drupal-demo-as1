@@ -63,4 +63,4 @@ jobs:
           app-name: 'as1-phpwp1'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_36C5C2CE9A5C4D37AC55A611E8D54B26 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D3C2C5E4C26A4825A872DC8E134E3C81 }}
