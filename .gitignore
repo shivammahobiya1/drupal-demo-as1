@@ -1,1 +1,5 @@
 /vendor/
+.sonar-project.properties
+.composer.lock
+.azure-pipelines.yml
+/git/
