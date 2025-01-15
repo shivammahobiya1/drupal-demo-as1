@@ -31,7 +31,7 @@ RUN cd /etc/apache2/sites-enabled
 RUN rm -Rf 000-default.conf
 COPY 000-default.conf /etc/apache2/sites-enabled/ 
 #copied htaccess
-COPY .htaccess /var/www/html/drupal-site/
+COPY .htaccess /var/www/html
 RUN mkdir -p /var/www/html/sites/default/files
 RUN chown www-data:www-data /var/www/html
 #RUN chown www-data:www-data /var/www/html/sites/default/files
