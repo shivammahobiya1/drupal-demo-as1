@@ -828,3 +828,4 @@ $databases['default']['default'] = array (
   ],
 );
 $settings['config_sync_directory'] = $app_root . '/../config/default';
+$config['system.logging']['error_level'] = 'verbose';
