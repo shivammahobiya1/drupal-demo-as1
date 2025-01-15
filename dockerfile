@@ -1,4 +1,4 @@
-From drupal:10.2.1
+FROM drupal:10.2.1
 ARG CERTPATH
 RUN mkdir /drupal-site
 COPY . /drupal-site/
